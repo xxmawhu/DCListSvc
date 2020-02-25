@@ -16,6 +16,7 @@
 
 #include "HadronInfo/ParticleInf.h"
 #include "BesStdSelector/Selector.h"
+#include "TupleSvc/DecayTree.h"
 
 #include "DCListSvc/DCListSvc.h"
 #include "DTagAlg/LocalKaonSelector.h"
@@ -25,154 +26,207 @@ using BesStdSelector::secondaryProtonSelector;
 CDDecayList DCListSvc::DecayList(int pid) {
     // Ks 310 ; K 321 ; Pion 211 ; Pi0 111 ; Eta 221 ; eta' 331
     // Lambda: 3122, Omega: 3334, etaV3pi 2212211, electron 11
-    CDDecayList decayList;
+    if (abs(pid) == 11 || abs(pid) == 211 || abs(pid) == 2212
+           || abs(pid) == 321 ) {
+        return PrimaryTrk(pid);
+    } 
+    if (pid == 22) {
+        // 22 means solo photon
+        return SoloPhoton();
+    } 
     switch (pid) {
-        case 310:
+        case 310: 
+        {
+            if (m_initList["m_KsList"]) {
+                CDDecayList ks(BesStdSelector::ksSelector);
+                ks = SecondaryTrk(211) * SecondaryTrk(-211);
+                m_KsList = ks;
+                m_initList["m_KsList"] = false;
+            }
             return m_KsList;
-
-        case 321:
-            decayList = m_KaonPrimaryList.plus();
-            return decayList;
-
-        case -321:
-            decayList = m_KaonPrimaryList.minus();
-            return decayList;
-
-        case 211:
-            decayList = m_PionPrimaryList.plus();
-            return decayList;
-
-        case -211:
-            decayList = m_PionPrimaryList.minus();
-            return decayList;
-
-        case 11:
-            decayList = m_ElectronList.plus();
-            return decayList;
-
-        case -11:
-            decayList = m_ElectronList.minus();
-            return decayList;
-
+        }
         case 111:
-            decayList = m_Pi0List;
-            return decayList;
-
+        {
+            if (m_initList["m_Pi0List"]) {
+                CDDecayList pi0(BesStdSelector::pi0Selector);
+                pi0 = Photon() * Photon();
+                m_Pi0List = pi0;
+                m_initList["m_Pi0List"] = false;
+            }
+            return m_Pi0List;
+        }
         case 221:
+        {
+            if (m_initList["m_EtaList"]) {
+                CDDecayList pi0(BesStdSelector::etatoGGSelector);
+                pi0 = Photon() * Photon();
+                m_EtaList = pi0;
+                m_initList["m_EtaList"] = false;
+            }
             return m_EtaList;
-
-        case 22:
-            decayList = m_PhotonList;
-            return decayList;
-
-        case 331: {  // Eta'  42.6(7)
-            CDDecayList EtaP(BesStdSelector::EtaPtoPiPiEtaSelector);
-            EtaP = m_PionPrimaryList.plus() * m_PionPrimaryList.minus() *
-                   m_EtaList;
-            return EtaP;
         }
-        case 223: {  // omega  89.2(7)
-            CDDecayList omegaList(BesStdSelector::omegaSelector);
-            omegaList = m_PionPrimaryList.plus() * m_PionPrimaryList.minus() *
-                        m_Pi0List;
-            return omegaList;
+        case 331:   
+        {
+            // Eta'  42.6(7)
+            if (m_initList["m_EtapList"]) {
+                CDDecayList EtaP(BesStdSelector::EtaPtoPiPiEtaSelector);
+                EtaP = PrimaryTrk(211) * PrimaryTrk(-211) * DecayList(111);
+                m_EtapList = EtaP;
+                m_initList["m_EtapList"] = false;
+            }
+            return m_EtapList;
         }
-
-        case 333: {  // phi 492(5)
+        case 223: 
+        {
+            // omega  89.2(7)
+            if (m_initList["m_omegaList"]) {
+                CDDecayList omega(BesStdSelector::omegaSelector);
+                omega = PrimaryTrk(211) * PrimaryTrk(-211) * DecayList(111);
+                m_omegaList = omega;
+                m_initList["m_omegaList"] = false;
+            }
+            return m_omegaList;
+        }
+        case 333:   
+        {    // phi 492(5)
             CDDecayList phiList(BesStdSelector::phiSelector);
             phiList = m_KaonPrimaryList.plus() * m_KaonPrimaryList.minus();
             return phiList;
         }
-
-        case 2212:
-            decayList = m_ProtonPrimaryList.plus();
-            return decayList;
-
-        case -2212:
-            decayList = m_ProtonPrimaryList.minus();
-            return decayList;
-
-        case 3122: {
-            CDDecayList Lambda(BesStdSelector::lambdaSelector);
-            Lambda = m_ProtonAllList.plus() * m_PionAllList.minus();
-            return Lambda;
+        case 3122: 
+        { 
+            if (m_initList["m_LambdaList"]) {
+                CDDecayList Lambda(BesStdSelector::lambdaSelector);
+                Lambda = SecondaryTrk(2212) * SecondaryTrk(-211);
+                m_LambdaList = Lambda;
+                m_initList["m_LambdaList"] = false;
+            }
+            return m_LambdaList;
         }
-
-        case -3122: {
-            CDDecayList Lambdabar(BesStdSelector::lambdaSelector);
-            Lambdabar = m_ProtonAllList.minus() * m_PionAllList.plus();
-            return Lambdabar;
+        case -3122: 
+        {    if (m_initList["m_LambdaBarList"]) {
+               CDDecayList Lambda(BesStdSelector::lambdaSelector);
+               Lambda = SecondaryTrk(-2212) * SecondaryTrk(211);
+               m_LambdaBarList = Lambda;
+               m_initList["m_LambdaBarList"] = false;
+           }
+           return m_LambdaBarList;
         }
-        case 2212211: {
-            CDDecayList Eta(BesStdSelector::etatoPiPiPi0Selector);
-            Eta = m_PionPrimaryList.plus() * m_PionPrimaryList.minus() *
-                  m_Pi0List;
-            return Eta;
+        case 2212211: 
+        {
+            if (m_initList["m_EtatoPiPiPi0List"]) {
+                CDDecayList Eta(BesStdSelector::etatoPiPiPi0Selector);
+                Eta = SecondaryTrk(211) * SecondaryTrk(-211) * DecayList(111);
+                m_EtatoPiPiPi0List = Eta;
+                m_initList["m_EtatoPiPiPi0List"] = false;
+            }
+            return m_EtatoPiPiPi0List;
         }
-
-        case 3212: {
-            CDDecayList Sigma0(BesStdSelector::Sigma0Selector);
-            // Sigma0 = Lambda * m_PhotonList;
-            Sigma0 = DecayList(3122) * m_PhotonList;
-            return Sigma0;
+        case 3212: 
+        {
+            if (m_initList["m_Sigma0List"]) {
+                CDDecayList Sigma0(BesStdSelector::Sigma0Selector);
+                Sigma0 = DecayList(3122) * Photon();
+                m_SigmapList = Sigma0;
+                m_initList["m_Sigma0List"] = false;
+            }
+            return m_Sigma0List;
         }
-
-        case -3212: {
-            CDDecayList Sigma0bar(BesStdSelector::Sigma0Selector);
-            // Sigma0bar = Lambdabar * m_PhotonList;
-            Sigma0bar = DecayList(-3122) * m_PhotonList;
-            return Sigma0bar;
+        case -3212: 
+        {
+            if (m_initList["m_Sigma0BarList"]) {
+                CDDecayList Sigma0(BesStdSelector::Sigma0Selector);
+                Sigma0 = DecayList(3122) * Photon();
+                m_SigmapList = Sigma0;
+                m_initList["m_Sigma0BarList"] = false;
+            }
+            return m_Sigma0BarList;
         }
-
-        case 3334: {
-            CDDecayList Omega(BesStdSelector::OmegaSelector);
-            Omega = DecayList(3122) * m_KaonAllList.minus();
-            return Omega;
+        case 3334: 
+        {
+            if (m_initList["m_OmegaList"]) {
+                CDDecayList Omega(BesStdSelector::OmegaSelector);
+                Omega = DecayList(3122) * SecondaryTrk(-321);
+                m_OmegaList = Omega;
+                m_initList["m_OmegaList"] = false;
+            }
+            return m_OmegaList;
         }
-
-        case -3334: {
-            CDDecayList Omegabar(BesStdSelector::OmegaSelector);
-            Omegabar = DecayList(-3122) * m_KaonAllList.plus();
-            return Omegabar;
+        case -3334: 
+        {
+            if (m_initList["m_OmegaBarList"]) {
+                CDDecayList Omega(BesStdSelector::OmegaSelector);
+                Omega = DecayList(-3122) * SecondaryTrk(321);
+                m_OmegaBarList = Omega;
+                m_initList["m_OmegaBarList"] = false;
+            }
+            return m_OmegaBarList;
         }
-        // Simga+ -> p pi0
-        case 3222: {
-            CDDecayList Sigmap(BesStdSelector::SigmapSelector);
-            Sigmap = m_ProtonAllList.plus() * m_Pi0List;
-            return Sigmap;
+        case 3222: 
+        {
+            if (m_initList["m_SigmapList"]) {
+                CDDecayList mSigmap(BesStdSelector::SigmapSelector);
+                mSigmap = SecondaryTrk(2212) * DecayList(111);
+                m_SigmapList = mSigmap;
+                m_initList["m_SigmapList"] = false;
+            }
+            return m_SigmapList;
         }
-        case -3222: {
-            CDDecayList Sigmap(BesStdSelector::SigmapSelector);
-            Sigmap = m_ProtonAllList.minus() * m_Pi0List;
-            return Sigmap;
+        case -3222: 
+        {
+            if (m_initList["m_SigmapBarList"]) {
+                CDDecayList mSigmap(BesStdSelector::SigmapSelector);
+                mSigmap = m_ProtonAllList.plus() * m_Pi0List;
+                mSigmap = SecondaryTrk(2212) * DecayList(111);
+                m_SigmapBarList = mSigmap;
+                m_initList["m_SigmapBarList"] = false;
+            }
+            return m_SigmapBarList;
         }
         // 3312  Xi- -> Lambda pi-
-        case 3312: {
-            CDDecayList Xim(BesStdSelector::XimSelector);
-            Xim = DecayList(3122) * m_PionAllList.minus();
-            return Xim;
+        case 3312: 
+        {
+            if (m_initList["m_XimList"]) {
+                CDDecayList Xim(BesStdSelector::XimSelector);
+                Xim = DecayList(3122) * SecondaryTrk(-211);
+                m_XimList = Xim;
+                m_initList["m_XimList"] = false;
+            }
+            return m_XimList;
         }
-        case -3312: {
-            CDDecayList Xim(BesStdSelector::XimSelector);
-            Xim = DecayList(-3122) * m_PionAllList.plus();
-            return Xim;
+        case -3312: 
+        {
+            if (m_initList["m_XimBarList"]) {
+                CDDecayList Xim(BesStdSelector::XimSelector);
+                Xim = DecayList(3122) * SecondaryTrk(-211);
+                m_XimBarList = Xim;
+                m_initList["m_XimBarList"] = false;
+            }
+            return m_XimBarList;
         }
-        // 3322  Xi0 -> Lambda pi0
-        case 3322: {
-            CDDecayList Xi0(BesStdSelector::Xi0Selector);
-            Xi0 = DecayList(3122) * m_Pi0List;
-            return Xi0;
+        case 3322: 
+        {
+            // 3322  Xi0 -> Lambda pi0
+            if (m_initList["m_Xi0List"]) {
+                CDDecayList Xi0(BesStdSelector::Xi0Selector);
+                Xi0 = DecayList(3122) * DecayList(111);
+                m_Xi0List = Xi0;
+                m_initList["m_Xi0List"] = false;
+            }
+            return m_Xi0List;
         }
-        case -3322: {
-            CDDecayList Xi0(BesStdSelector::Xi0Selector);
-            Xi0 = DecayList(-3122) * m_Pi0List;
-            return Xi0;
+        case -3322: 
+        {
+            // 3322  Xi0 -> Lambda pi0
+            if (m_initList["m_Xi0BarList"]) {
+                CDDecayList Xi0(BesStdSelector::Xi0Selector);
+                Xi0 = DecayList(3122) * DecayList(111);
+                m_Xi0BarList = Xi0;
+                m_initList["m_Xi0BarList"] = false;
+            }
+            return m_Xi0BarList;
         }
-
-        default:
-            return decayList;
     }
-    return decayList;
 }
 
 CDDecayList DCListSvc::DecayList(vector<int> fid) {
@@ -266,4 +320,8 @@ CDDecayList DCListSvc::DecayList(vector<int> fid) {
             return decayList;
         }
     }
+}
+
+CDDecayList DCListSvc::DecayList(const DecayTree& decayTree) {
+    return DecayList(decayTree.GetFID());
 }

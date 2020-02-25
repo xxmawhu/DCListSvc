@@ -12,9 +12,9 @@
 #ifndef DCListSvc__IDCListSvc_H
 #define DCListSvc__IDCListSvc_H
 #include "GaudiKernel/IService.h"
-#include "McTruth/McParticle.h"
-#include "EvtRecEvent/EvtRecTrack.h"
-#include "CLHEP/Vector/LorentzVector.h"
+// #include "McTruth/McParticle.h"
+// #include "EvtRecEvent/EvtRecTrack.h"
+// #include "CLHEP/Vector/LorentzVector.h"
 
 /* Decaration of the interface ID */
 static const InterfaceID IID_IDCListSvc("IDCListSvc", 1, 0);

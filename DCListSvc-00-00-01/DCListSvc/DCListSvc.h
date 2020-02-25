@@ -48,41 +48,48 @@ class DCListSvc : public Service,
     DCListSvc(const std::string &name, ISvcLocator *pSvcLocator);
     virtual ~ DCListSvc();
     virtual StatusCode initialize();
-    virtual StatusCode execute();
     virtual StatusCode finalize();
     virtual StatusCode queryInterface(const InterfaceID& riid, void** ppvIF);
     void init();
+    CDDecayList DecayList(int);
+    CDDecayList DecayList(std::vector<int> fid);
+    CDDecayList DecayList(const DecayTree& decayTree);
+    CDDecayList& Photon();
+    CDDecayList& SoloPhoton();
+    CDDecayList PrimaryTrk(int);
+    CDDecayList SecondaryTrk(int);
 
    private:
     IDataProviderSvc* eventSvc_;
     IDatabaseSvc* m_dbsvc;
-    mutable EventNavigator* m_navigator;
+    BeamInfoSvc *gBeamInfoSvc;
+    // mutable EventNavigator* m_navigator;
     double m_Ecm;
     bool m_readBeamE;
     int m_runID, m_eventID;
+    int m_InfoLvl;
     bool m_newEvent;
     
-    BeamInfoSvc *gBeamInfoSvc;
     std::map<std::string, bool> m_initList;
+    CDDecayList& Shower(bool);
+
     CDElectronList m_ElectronList, m_ElectronAllList;
     CDChargedPionList m_PionNoPID, m_PionPrimaryList, m_PionAllList;
     CDChargedKaonList m_KaonPrimaryList, m_KaonAllList;
     CDProtonList m_ProtonPrimaryList, m_ProtonAllList;
-    CDDecayList m_LambdaList;
+    CDDecayList m_LambdaList, m_LambdaBarList;
     CDDecayList m_Pi0List;
     CDDecayList m_KsList;
-    CDDecayList m_EtaList;
+    CDDecayList m_EtaList, m_EtatoPiPiPi0List;
+    CDDecayList m_EtapList, m_omegaList;
     CDDecayList m_PhotonList;
-    CDDecayList m_OmegaList;
-    CDDecayList m_OmegamList;
-    CDDecayList m_XimList;
-    CDDecayList m_Sigma0List;
-    CDDecayList m_SigmapList;
+    CDDecayList m_PhotonSoloList;
+    CDDecayList m_OmegaList, m_OmegaBarList;
+    CDDecayList m_XimList, m_XimBarList;
+    CDDecayList m_Xi0List, m_Xi0BarList;
+    CDDecayList m_Sigma0List, m_Sigma0BarList;
+    CDDecayList m_SigmapList, m_SigmapBarList;
 
-    CDDecayList DecayList(int);
-    CDDecayList DecayList(std::vector<int> fid);
 };
 
-#endif /* PHYS_ANA_OMEGAXIKALG_HPP */
-/* ===================================================================<<< */
-/* ===================== DCListSvc.hpp ends here ====================== */
+#endif

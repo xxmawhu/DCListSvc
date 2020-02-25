@@ -25,5 +25,9 @@ use MCTruthInfo MCTruthInfo-* Utilities
 use BeamInfoSvc BeamInfoSvc-00-* Utilities
 use PhotonConverSvc PhotonConverSvc-00-* Utilities
 
-apply_pattern component_library 
-library DCListSvc  *.cpp  util/*.cpp selector/*.cpp components/*.cxx
+apply_pattern installed_linkopts
+library DCListSvc  *.cpp  util/*.cpp components/*.cxx
+apply_pattern package_linkopts
+apply_pattern package_stamps
+apply_pattern ld_library_path
+apply_pattern package_shlibflags

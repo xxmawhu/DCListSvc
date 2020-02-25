@@ -48,12 +48,23 @@ decayList = [
     "m_EtaList",
     "m_PhotonList",
     "m_OmegaList",
-    "m_OmegamList",
+    "m_omegaList",
     "m_XimList",
+    "m_XimBarList",
     "m_Sigma0List",
+    "m_Sigma0BarList",
     "m_SigmapList",
+    "m_omegaList",
+    "m_EtatoPiPiPi0List",
+    "m_LambdaBarList",
+    "m_OmegaBarList",
+    "m_SigmapBarList",
+    "m_Xi0List",
+    "m_Xi0BarList",
+    "m_PhotonList",
+    "m_PhotonSoloList",
 ]
-for d in decayList:
+for d in set(decayList):
     head += "{}.eraseContents();".format(d)
     head += 'm_initList["{}"] = true;'.format(d)
 head += "}"

@@ -45,6 +45,7 @@ StatusCode DCListSvc::queryInterface(const InterfaceID& riid, void** ppvIF) {
     } else {
         return Service::queryInterface(riid, ppvIF);
     }
+    // It works
     addRef();
     // cout<<"DCListSvc::Inf:queryInterface"<<endl;
     return StatusCode::SUCCESS;
