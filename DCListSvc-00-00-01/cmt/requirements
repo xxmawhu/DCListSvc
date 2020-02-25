@@ -1,0 +1,29 @@
+package DCListSvc
+author Xinxin Ma <maxx@ihep.ac.cn>
+author HaoKai Sun <sunhk@ihep.ac.cn>
+
+use BesPolicy        BesPolicy-*
+
+use GaudiInterface   GaudiInterface-*   External
+
+use McTruth             McTruth-*               Event
+use EventModel          EventModel-*            Event
+use BesDChain           BesDChain-*           Event
+use EvtRecEvent         EvtRecEvent-*           Event
+use ParticleID          ParticleID-*            Analysis
+use VertexFit           VertexFit-*             Analysis
+
+use McDecayModeSvc      McDecayModeSvc-*        Utilities
+use GammaConv           GammaConv-*             Utilities
+use DTagAlg DTagAlg-* Reconstruction
+
+use MCTruthMatchSvc MCTruthMatchSvc-* Utilities
+use BesStdSelector BesStdSelector-* Utilities 
+use HadronInfo HadronInfo-* Utilities
+use TupleSvc TupleSvc-* Utilities
+use MCTruthInfo MCTruthInfo-* Utilities
+use BeamInfoSvc BeamInfoSvc-00-* Utilities
+use PhotonConverSvc PhotonConverSvc-00-* Utilities
+
+apply_pattern component_library 
+library DCListSvc  *.cpp  util/*.cpp selector/*.cpp components/*.cxx

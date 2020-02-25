@@ -1,0 +1,46 @@
+# LSP Projectile
+.ccls-cache/
+.ccls-cache*
+.projectile
+
+# sshfs
+.fuse_hidden*
+
+# CMT config
+cleanup.*sh
+setup.*sh
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+x86*
+*.root
